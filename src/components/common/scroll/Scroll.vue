@@ -14,6 +14,10 @@ export default {
     probeType: {
       type: Number,
       default: 0
+    },
+    pullUpLoad: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -32,14 +36,24 @@ export default {
       observeImage: true
     })
     //2.监听滚动的位置
-    this.scroll.on('scroll', (position) => {
-      this.$emit('scroll', position)
-    })
-    console.log(this.scroll);
+    if (this.probeType === 2 || this.probeType === 3) {
+      this.scroll.on('scroll', (position) => {
+        this.$emit('scroll', position)
+      })
+    }
+    //3.监听滚动位置
+    if (this.pullUpLoad) {
+      this.scroll.on('pullingUp', () => {
+        this.$emit('pullingUp');
+      })
+    }
   },
   methods: {
+    finishPullUp() {
+      this.scroll && this.scroll.finishPullUp()
+    },
     scrollTo(x, y, time=300){
-      this.scroll.scrollTo(x, y, time)
+      this.scroll && this.scroll.scrollTo(x, y, time)
     }
   }
 }

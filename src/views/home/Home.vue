@@ -1,13 +1,15 @@
 <template>
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <scroll class="content" ref="scroll" :probe-type="3"
-            @scroll="contentScroll">
+    <scroll class="content" ref="scroll"
+            :probe-type="3"
+            @scroll="contentScroll"
+            :pull-up-load="true"
+            @pullingUp="loadMore">
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view></feature-view>
-      <tab-control class=tab-control
-                   :titles="['流行','新款','精选']"
+      <tab-control :titles="['流行','新款','精选']"
                    @tabClick="tabClick"></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
@@ -69,6 +71,9 @@
       this.getHomeGoods('sell')
     },
     methods: {
+      loadMore() {
+        this.getHomeGoods(this.currentType)
+      },
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
       },
@@ -106,6 +111,9 @@
         getHomeGoods(type, 1).then(res => {
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
+
+          //完成上拉加载更多
+          this.$refs.scroll.finishPullUp()
         })
       }
     }
@@ -128,11 +136,6 @@
     z-index: 9;
   }
 
-  .tab-control {
-    position: sticky;
-    top: 44px;
-    z-index: 9;
-  }
   .content {
     overflow: hidden;
     position: absolute;
