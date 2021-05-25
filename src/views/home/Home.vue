@@ -1,16 +1,22 @@
 <template>
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-control :titles="['流行','新款','精选']"
+                 @tabClick="tabClick"
+                 ref="tabControl1"
+                 class="tabControl"
+                 v-show="isTabFixed"></tab-control>
     <scroll class="content" ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
             :pull-up-load="true"
             @pullingUp="loadMore">
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view></feature-view>
       <tab-control :titles="['流行','新款','精选']"
-                   @tabClick="tabClick"></tab-control>
+                   @tabClick="tabClick"
+                   ref="tabControl2"></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
@@ -53,7 +59,9 @@
           'sell': { page: 0, list: []}
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        tabOffsetTop: 0,
+        isTabFixed: false
       }
     },
     computed: {
@@ -70,12 +78,18 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+
     methods: {
+      swiperImageLoad() {
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+      },
       loadMore() {
         this.getHomeGoods(this.currentType)
       },
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
+        //tabControl吸顶效果
+        this.isTabFixed = (-position.y) > this.tabOffsetTop
       },
       backClick() {
         this.$refs.scroll.scrollTo(0, 0)
@@ -95,6 +109,8 @@
             this.currentType='sell'
             break
         }
+        this.$refs.tabControl1.currentIndex = index;
+        this.$refs.tabControl2.currentIndex = index;
       },
 
       /**
@@ -128,14 +144,12 @@
   .home-nav {
     background-color: var(--color-tint);
     color: #ffffff;
-
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 9;
   }
 
+  .tab-control {
+    position: relative;
+    z-index: 9;
+  }
   .content {
     overflow: hidden;
     position: absolute;
