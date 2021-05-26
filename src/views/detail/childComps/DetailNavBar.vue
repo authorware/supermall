@@ -49,7 +49,7 @@ export default {
     color: var(--color-tint);
   }
   .back img {
-    margin-top: 12px;
-    margin-left: 15px;
+    vertical-align: middle;
+    margin-left: 13px;
   }
 </style>
