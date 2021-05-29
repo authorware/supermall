@@ -1,14 +1,14 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav"></detail-nav-bar>
-    <scroll class="content">
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick"></detail-nav-bar>
+    <scroll ref="scroll" class="content">
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
-      <detail-goods-info :detail-info="detailInfo"></detail-goods-info>
-      <detail-param-info :param-info="paramInfo"></detail-param-info>
-      <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
-      <goods-list :goods="recommends"></goods-list>
+      <detail-goods-info :detail-info="detailInfo" @detailImageLoad="detailImageLoad"></detail-goods-info>
+      <detail-param-info ref="params" :param-info="paramInfo"></detail-param-info>
+      <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
+      <goods-list ref="recommend" :goods="recommends"></goods-list>
     </scroll>
   </div>
 </template>
@@ -26,6 +26,8 @@ import Scroll from "components/common/scroll/Scroll";
 import GoodsList from "components/content/goods/GoodsList";
 
 import {getDetail, Goods, Shop, GoodsParam, getRecommend} from "network/detail";
+
+import {debounce} from "common/utils"
 export default {
   name: "Detail",
   components: {
@@ -48,7 +50,9 @@ export default {
       detailInfo: {},
       paramInfo: {},
       commentInfo: {},
-      recommends: []
+      recommends: [],
+      themeTopYs: [],
+      getThemeTopY: null
     }
   },
   created() {
@@ -72,11 +76,30 @@ export default {
       if (data.rate.cRate !== 0) {
         this.commentInfo = data.rate.list[0];
       }
-      //7.请求推荐数据
-      getRecommend().then(res => {
-        this.recommends = res.data.list
-      })
-    })
+    }),
+    //3.请求推荐数据
+    getRecommend().then(res => {
+      this.recommends = res.data.list
+    }),
+    //4.给getThemeTopY赋值(对给this.themeTopYs赋值操作进行防抖)
+    this.getThemeTopY = debounce(() => {
+      this.themeTopYs = []
+      this.themeTopYs.push(0)
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop - 44);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
+      console.log(this.themeTopYs)
+    }, 100)
+  },
+  methods: {
+    detailImageLoad() {
+      console.log('fulei')
+      this.$refs.scroll.refresh();
+      this.getThemeTopY();
+    },
+    titleClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index])
+    }
   }
 }
 </script>
