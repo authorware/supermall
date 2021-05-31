@@ -1,7 +1,7 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav" @titleClick="titleClick"></detail-nav-bar>
-    <scroll ref="scroll" class="content">
+    <detail-nav-bar class="detail-nav" ref="nav" @titleClick="titleClick"></detail-nav-bar>
+    <scroll ref="scroll" class="content" :probe-type="3" @scroll="contentScroll">
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
@@ -28,6 +28,7 @@ import GoodsList from "components/content/goods/GoodsList";
 import {getDetail, Goods, Shop, GoodsParam, getRecommend} from "network/detail";
 
 import {debounce} from "common/utils"
+
 export default {
   name: "Detail",
   components: {
@@ -52,7 +53,8 @@ export default {
       commentInfo: {},
       recommends: [],
       themeTopYs: [],
-      getThemeTopY: null
+      getThemeTopY: null,
+      currentIndex: 0
     }
   },
   created() {
@@ -65,7 +67,7 @@ export default {
       const data = res.result
       this.topImages = data.itemInfo.topImages
       //2.获取商品信息
-      this.goods= new Goods(data.itemInfo, data.columns, data.shopInfo.services)
+      this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services)
       //3.获取店铺信息
       this.shop = new Shop(data.shopInfo)
       //4.保存商品的详情信息
@@ -77,23 +79,33 @@ export default {
         this.commentInfo = data.rate.list[0];
       }
     }),
-    //3.请求推荐数据
-    getRecommend().then(res => {
-      this.recommends = res.data.list
-    }),
-    //4.给getThemeTopY赋值(对给this.themeTopYs赋值操作进行防抖)
-    this.getThemeTopY = debounce(() => {
-      this.themeTopYs = []
-      this.themeTopYs.push(0)
-      this.themeTopYs.push(this.$refs.params.$el.offsetTop - 44);
-      this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
-      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
-      console.log(this.themeTopYs)
-    }, 100)
+      //3.请求推荐数据
+      getRecommend().then(res => {
+        this.recommends = res.data.list
+      }),
+      //4.给getThemeTopY赋值(对给this.themeTopYs赋值操作进行防抖)
+      this.getThemeTopY = debounce(() => {
+        this.themeTopYs = []
+        this.themeTopYs.push(0)
+        this.themeTopYs.push(this.$refs.params.$el.offsetTop - 44);
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
+        this.themeTopYs.push(Number.MAX_VALUE)
+      }, 100)
   },
   methods: {
+    contentScroll(position) {
+      const positionY = -position.y
+      let length = this.themeTopYs.length
+
+      for (let i = 0; i < length - 1; i++) {
+        if (this.currentIndex !== i && (positionY > this.themeTopYs[i] && positionY < this.themeTopYs[i + 1])) {
+          this.currentIndex = i
+          this.$refs.nav.currentIndex = this.currentIndex
+        }
+      }
+    },
     detailImageLoad() {
-      console.log('fulei')
       this.$refs.scroll.refresh();
       this.getThemeTopY();
     },
@@ -105,21 +117,21 @@ export default {
 </script>
 
 <style scoped>
-  #detail {
-    position: relative;
-    z-index: 9;
-    background-color: #ffffff;
-    height: 100vh;
-  }
+#detail {
+  position: relative;
+  z-index: 9;
+  background-color: #ffffff;
+  height: 100vh;
+}
 
-  .detail-nav {
-    position: relative;
-    z-index: 9;
-    background-color: #ffffff;
-  }
+.detail-nav {
+  position: relative;
+  z-index: 9;
+  background-color: #ffffff;
+}
 
-  .content {
-    height: calc(100% - 44px);
-  }
+.content {
+  height: calc(100% - 44px);
+}
 
 </style>
