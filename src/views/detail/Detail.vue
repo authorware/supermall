@@ -10,6 +10,8 @@
       <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
       <goods-list ref="recommend" :goods="recommends"></goods-list>
     </scroll>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -21,6 +23,7 @@ import DetailShopInfo from './childComps/DetailShopInfo';
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 
 import Scroll from "components/common/scroll/Scroll";
 import GoodsList from "components/content/goods/GoodsList";
@@ -28,6 +31,7 @@ import GoodsList from "components/content/goods/GoodsList";
 import {getDetail, Goods, Shop, GoodsParam, getRecommend} from "network/detail";
 
 import {debounce} from "common/utils"
+import {backTopMixin} from "common/mixin";
 
 export default {
   name: "Detail",
@@ -39,9 +43,11 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     Scroll,
     GoodsList
   },
+  mixins: [backTopMixin],
   data() {
     return {
       iid: null,
@@ -94,6 +100,9 @@ export default {
       }, 100)
   },
   methods: {
+    addToCart() {
+
+    },
     contentScroll(position) {
       const positionY = -position.y
       let length = this.themeTopYs.length
@@ -104,6 +113,8 @@ export default {
           this.$refs.nav.currentIndex = this.currentIndex
         }
       }
+      //是否显示返回顶部
+      this.listenShowBackTop(position)
     },
     detailImageLoad() {
       this.$refs.scroll.refresh();
@@ -131,7 +142,7 @@ export default {
 }
 
 .content {
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 49px);
 }
 
 </style>
