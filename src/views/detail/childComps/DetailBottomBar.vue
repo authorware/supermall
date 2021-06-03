@@ -34,8 +34,8 @@ export default {
 
 <style scoped>
 .bottom-bar {
-  height: 53px;
-  position: fixed;
+  height: 49px;
+  position: relative;
   background-color: #fff;
   left: 0;
   right: 0;
@@ -55,14 +55,14 @@ export default {
 }
 
 .bar-left .text {
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .bar-left .icon {
   display: block;
   width: 22px;
   height: 22px;
-  margin: 10px auto 3px;
+  margin: 10px auto 0px;
   background: url("~assets/img/detail/detail_bottom.png") 0 0/100%;
 }
 
