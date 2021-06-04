@@ -34,8 +34,8 @@ export default {
 
 <style scoped>
 .bottom-bar {
-  height: 49px;
-  position: relative;
+  height: 53px;
+  position: absolute;
   background-color: #fff;
   left: 0;
   right: 0;
