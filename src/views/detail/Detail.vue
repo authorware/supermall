@@ -32,6 +32,7 @@ import {getDetail, Goods, Shop, GoodsParam, getRecommend} from "network/detail";
 
 import {debounce} from "common/utils"
 import {backTopMixin} from "common/mixin";
+import {mapActions} from "vuex"
 
 export default {
   name: "Detail",
@@ -100,6 +101,7 @@ export default {
       }, 100)
   },
   methods: {
+    ...mapActions(['addCart']),
     addToCart() {
       //1.获取购物车需要展示到数据
       const product = {}
@@ -109,12 +111,18 @@ export default {
       product.price = this.goods.realPrice
       product.iid = this.iid
 
-      //2.将商品添加到购物车
+      //2.将商品添加到购物车(1.Promise 2.mapActions)
       // this.$store.cartList.push(product)
       // this.$store.commit('addCart', product)
-      this.$store.dispatch('addCart', product)
 
+      //以下二选一即可
+      // this.$store.dispatch('addCart', product).then(res => {
+      //   console.log(res);
+      // })
 
+      this.addCart(product).then(res => {
+        console.log(res);
+      })
     },
     contentScroll(position) {
       const positionY = -position.y
