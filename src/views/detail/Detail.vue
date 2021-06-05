@@ -2,11 +2,6 @@
   <div id="detail">
     <detail-nav-bar class="detail-nav" ref="nav" @titleClick="titleClick"></detail-nav-bar>
     <scroll ref="scroll" class="content" :probe-type="3" @scroll="contentScroll">
-      <ul>
-        <li v-for="item in $store.state.cartList">
-          {{item}}
-        </li>
-      </ul>
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
@@ -111,7 +106,7 @@ export default {
       product.image = this.topImages[0]
       product.title = this.goods.title
       product.desc = this.goods.desc
-      product.price = this.goods.newPrice
+      product.price = this.goods.realPrice
       product.iid = this.iid
 
       //2.将商品添加到购物车
