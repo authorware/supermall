@@ -1,7 +1,7 @@
 <template>
   <div class="bottom-bar">
     <div class="check-content">
-      <check-button class="check-button"></check-button>
+      <check-button :is-checked="isSelectAll" class="check-button" @click.native="checkClick"></check-button>
       <span>全选</span>
     </div>
     <div class="price">
@@ -34,6 +34,19 @@ export default {
     },
     checkLength() {
       return this.cartList.filter(item => { return item.checked }).length
+    },
+    isSelectAll() {
+      if (this.cartList.length === 0) return false;
+      return !(this.cartList.find(item => {return !item.checked}))
+    }
+  },
+  methods: {
+    checkClick() {
+      if (this.isSelectAll) {
+        this.cartList.forEach(item => {return item.checked = false})
+      } else { // 部分选中 剩余的未选中
+        this.cartList.forEach(item => {return item.checked = true})
+      }
     }
   }
 }
