@@ -4,9 +4,11 @@
     <tab-control :titles="['流行','新款','精选']"
                  @tabClick="tabClick"
                  ref="tabControl1"
-                 class="tabControl"
-                 v-show="isTabFixed"></tab-control>
-    <scroll class="content" ref="scroll"
+                 class="tab-control"
+                 v-show="isTabFixed">
+    </tab-control>
+    <scroll class="content"
+            ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
             :pull-up-load="true"
@@ -16,7 +18,9 @@
       <feature-view></feature-view>
       <tab-control :titles="['流行','新款','精选']"
                    @tabClick="tabClick"
-                   ref="tabControl2"></tab-control>
+                   ref="tabControl2"
+                   class="tab-control">
+      </tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
